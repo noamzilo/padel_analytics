@@ -582,7 +582,7 @@ class BallTracker(Tracker):
                 batch_size = i.shape[0]
                 with torch.no_grad():
                     coor_inpaint = self.inpaintnet(
-                        coor_pred.to('mps'),
+                        coor_pred.to(self.DEVICE),
                         inpaint_mask.to('mps'),
                     ).detach().cpu()
                     
