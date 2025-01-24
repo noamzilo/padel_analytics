@@ -141,7 +141,7 @@ class KalmanFilter3DTracking(ExtendedKalmanFilter):
         fig = self.plot()
         fig.show()
         # Save to file
-        with open(filename, "w") as f:
+        with open(filename, "w", encoding="utf-8") as f:
             f.write(fig.to_html())
 
     def plot(self, projection_matrix=None):
