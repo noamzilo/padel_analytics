@@ -256,7 +256,7 @@ class BallTracker(Tracker):
         self.DELTA_T: float = 1 / math.sqrt(self.HEIGHT**2 + self.WIDTH**2)
         self.COOR_TH = self.DELTA_T * 50
 
-        tracknet_ckpt = torch.load(tracking_model_path, map_location=torch.device('mps'))
+        tracknet_ckpt = torch.load(tracking_model_path, map_location=self.DEVICE)
         self.tracknet_seq_len = tracknet_ckpt['param_dict']['seq_len']
 
         assert self.tracknet_seq_len == self.TRAJECTORY_LENGTH
