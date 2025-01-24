@@ -272,7 +272,7 @@ class BallTracker(Tracker):
         self.tracknet.eval()
 
         if inpainting_model_path:
-            inpaintnet_ckpt = torch.load(inpainting_model_path, map_location=torch.device('mps'))
+            inpaintnet_ckpt = torch.load(inpainting_model_path, map_location=self.DEVICE)
             self.inpaintnet_seq_len = inpaintnet_ckpt['param_dict']['seq_len']
             self.inpaintnet = get_model('InpaintNet')
             self.inpaintnet.load_state_dict(inpaintnet_ckpt['model'])
