@@ -122,7 +122,8 @@ if __name__ == "__main__":
 
     # FILTER FRAMES OF INTEREST (TODO)
 
-
+    if PLAYERS_TRACKER_LOAD_PATH is not None and not os.path.isfile(PLAYERS_TRACKER_LOAD_PATH):
+        PLAYERS_TRACKER_LOAD_PATH = None
     # Instantiate trackers
     players_tracker = PlayerTracker(
         PLAYERS_TRACKER_MODEL,
@@ -134,6 +135,8 @@ if __name__ == "__main__":
         save_path=PLAYERS_TRACKER_SAVE_PATH,
     )
 
+    if PLAYERS_KEYPOINTS_TRACKER_LOAD_PATH is not None and not os.path.isfile(PLAYERS_KEYPOINTS_TRACKER_LOAD_PATH):
+        PLAYERS_KEYPOINTS_TRACKER_LOAD_PATH = None
     player_keypoints_tracker = PlayerKeypointsTracker(
         PLAYERS_KEYPOINTS_TRACKER_MODEL,
         train_image_size=PLAYERS_KEYPOINTS_TRACKER_TRAIN_IMAGE_SIZE,
@@ -152,6 +155,8 @@ if __name__ == "__main__":
         save_path=BALL_TRACKER_SAVE_PATH,
     )
 
+    if KEYPOINTS_TRACKER_LOAD_PATH is not None and not os.path.isfile(KEYPOINTS_TRACKER_LOAD_PATH):
+        KEYPOINTS_TRACKER_LOAD_PATH = None
     keypoints_tracker = KeypointsTracker(
         model_path=KEYPOINTS_TRACKER_MODEL,
         batch_size=KEYPOINTS_TRACKER_BATCH_SIZE,

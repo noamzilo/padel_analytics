@@ -16,7 +16,7 @@ COLLECT_DATA_PATH = "data.csv"
 MAX_FRAMES = None
 
 # Fixed court keypoints´
-FIXED_COURT_KEYPOINTS_LOAD_PATH = None # "./cache/fixed_keypoints_detection.json"
+FIXED_COURT_KEYPOINTS_LOAD_PATH = "./cache/fixed_keypoints_detection.json"
 FIXED_COURT_KEYPOINTS_SAVE_PATH = "./cache/fixed_keypoints_detection.json"
 
 # Players tracker
@@ -45,6 +45,6 @@ BALL_TRACKER_SAVE_PATH = "./cache/ball_detections.json"
 KEYPOINTS_TRACKER_MODEL = "./weights/court_keypoints_detection/best.pt"
 KEYPOINTS_TRACKER_BATCH_SIZE = 8
 KEYPOINTS_TRACKER_MODEL_TYPE = "yolo"
-KEYPOINTS_TRACKER_LOAD_PATH = None
-KEYPOINTS_TRACKER_SAVE_PATH = None # "./cache/keypoints_detections.json"
+KEYPOINTS_TRACKER_LOAD_PATH = "./cache/keypoints_detections.json"
+KEYPOINTS_TRACKER_SAVE_PATH = "./cache/keypoints_detections.json"
 
