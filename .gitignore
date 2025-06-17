@@ -15,3 +15,6 @@ videos/
 
 train/
 models/
+
+/venv/
+/model_weights/
