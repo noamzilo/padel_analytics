@@ -1,3 +1,4 @@
+import os
 import timeit
 import json
 import cv2
@@ -90,6 +91,7 @@ if __name__ == "__main__":
         cv2.destroyAllWindows() 
 
     if FIXED_COURT_KEYPOINTS_SAVE_PATH is not None:
+        os.makedirs(os.path.dirname(FIXED_COURT_KEYPOINTS_SAVE_PATH), exist_ok=True)
         with open(FIXED_COURT_KEYPOINTS_SAVE_PATH, "w") as f:
             json.dump(SELECTED_KEYPOINTS, f)
 
@@ -115,7 +117,6 @@ if __name__ == "__main__":
             ),
             axis=0
         ),
-        frame_resolution_wh=video_info.resolution_wh,
     )
 
 

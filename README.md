@@ -29,6 +29,17 @@ pip install -r requirements.txt
 ```
 #### 3. Install pytorch <https://pytorch.org/get-started/locally/>.
 #### 4. Download weights.
+#### 5. Download https://sourceforge.net/projects/vcxsrv/ for windows
+#### 6. on wsl: 
+```
+sudo apt update
+sudo apt install libxcb-xinerama0
+```
+add to .backrc:
+export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0
+export LIBGL_ALWAYS_INDIRECT=1
+
+
    The current model weights used are available here https://drive.google.com/drive/folders/1joO7w1Am7B418SIqGBq90YipQl81FMzh?usp=drive_link. Configure the config.py file with your own model checkpoints paths. 
 # Inference
 At the root of this repo, edit the file config.py accordingly and run:

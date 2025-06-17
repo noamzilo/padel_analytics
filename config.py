@@ -2,6 +2,7 @@
 
 # Input video path
 INPUT_VIDEO_PATH = "./examples/videos/rally.mp4"
+# INPUT_VIDEO_PATH = "/mnt/c/data/plai/rallies/CVSPORTS_Padel/rallies/20231015_AMSTERDAM_04.mp4"
 
 # Inference video path
 OUTPUT_VIDEO_PATH = "results.mp4"
@@ -15,8 +16,8 @@ COLLECT_DATA_PATH = "data.csv"
 MAX_FRAMES = None
 
 # Fixed court keypoints´
-FIXED_COURT_KEYPOINTS_LOAD_PATH = "./cache/fixed_keypoints_detection.json"
-FIXED_COURT_KEYPOINTS_SAVE_PATH = None # "./cache/fixed_keypoints_detection.json"
+FIXED_COURT_KEYPOINTS_LOAD_PATH = None # "./cache/fixed_keypoints_detection.json"
+FIXED_COURT_KEYPOINTS_SAVE_PATH = "./cache/fixed_keypoints_detection.json"
 
 # Players tracker
 PLAYERS_TRACKER_MODEL = "./weights/players_detection/yolov8m.pt"
