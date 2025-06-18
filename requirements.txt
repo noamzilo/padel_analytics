@@ -9,3 +9,5 @@ supervision
 ultralytics
 streamlit
 parse
+pandas
+
