@@ -144,7 +144,9 @@ if __name__ == "__main__":
         load_path=PLAYERS_KEYPOINTS_TRACKER_LOAD_PATH,
         save_path=PLAYERS_KEYPOINTS_TRACKER_SAVE_PATH,
     )
-  
+
+    if BALL_TRACKER_LOAD_PATH is None or not os.path.isfile(BALL_TRACKER_LOAD_PATH):
+        BALL_TRACKER_LOAD_PATH = None
     ball_tracker = BallTracker(
         BALL_TRACKER_MODEL,
         BALL_TRACKER_INPAINT_MODEL,
