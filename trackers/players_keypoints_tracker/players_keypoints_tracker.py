@@ -12,7 +12,7 @@ from trackers.tracker import Object, Tracker, NoPredictFrames
 
 
 @dataclass
-class PlayerKeypoint:
+class BodyJoint:
 
     """
     Player pose keypoint detection in a given video frame
@@ -56,7 +56,7 @@ class PlayerKeypoint:
         return frame
     
     
-class PlayerKeypoints:
+class PlayerPose:
 
     """
     Player collection of pose keypoints
@@ -94,7 +94,7 @@ class PlayerKeypoints:
         ("right_shoulder", "neck"),
     ]
 
-    def __init__(self, player_keypoints: list[PlayerKeypoint]):
+    def __init__(self, player_keypoints: list[BodyJoint]):
 
         self.player_keypoints = player_keypoints
         
@@ -109,7 +109,7 @@ class PlayerKeypoints:
     @classmethod
     def from_json(cls, x: dict):
         player_keypoints = [
-            PlayerKeypoint.from_json(keypoint)
+            BodyJoint.from_json(keypoint)
             for keypoint in x["player_keypoints"]
         ]
         return cls(player_keypoints)
@@ -125,10 +125,10 @@ class PlayerKeypoints:
     def __len__(self) -> int:
         return len(self.player_keypoints)
     
-    def __iter__(self) -> Iterable[PlayerKeypoint]:
+    def __iter__(self) -> Iterable[BodyJoint]:
         return (keypoint for keypoint in self.player_keypoints)
     
-    def __getitem__(self, name: str) -> PlayerKeypoint:
+    def __getitem__(self, name: str) -> BodyJoint:
         
         assert name in self.KEYPOINTS_NAMES
 
@@ -162,21 +162,21 @@ class PlayerKeypoints:
         return frame
     
     
-class PlayersKeypoints(Object):
+class FramePoses(Object):
 
     """
     Players pose keypoints detections in a given video frame
     """
 
-    def __init__(self, players_keypoints: list[PlayerKeypoints]) -> None:
+    def __init__(self, players_keypoints: list[PlayerPose]) -> None:
         super().__init__()
         self.players_keypoints = players_keypoints
 
     @classmethod
-    def from_json(cls, x: dict | list[dict]) -> "PlayersKeypoints":
+    def from_json(cls, x: dict | list[dict]) -> "FramePoses":
         return cls(
             players_keypoints=[
-                PlayerKeypoints.from_json(player_keypoints_json)
+                PlayerPose.from_json(player_keypoints_json)
                 for player_keypoints_json in x
             ]
         )
@@ -190,10 +190,10 @@ class PlayersKeypoints(Object):
     def __len__(self) -> int:
         return len(self.players_keypoints)
     
-    def __iter__(self) -> Iterable[PlayerKeypoints]:
+    def __iter__(self) -> Iterable[PlayerPose]:
         return (player_keypoints for player_keypoints in self.players_keypoints)
 
-    def __getitem__(self, i: int) -> PlayerKeypoints:
+    def __getitem__(self, i: int) -> PlayerPose:
         return self.players_keypoints[i]
     
     def draw(self, frame: np.ndarray) -> np.ndarray:
@@ -246,7 +246,7 @@ class PlayerKeypointsTracker(Tracker):
         return self
     
     def object(self) -> Type[Object]:
-        return PlayersKeypoints
+        return FramePoses
     
     def draw_kwargs(self) -> dict:
         return {}
@@ -268,62 +268,70 @@ class PlayerKeypointsTracker(Tracker):
     def to(self, device: str) -> None:
         self.model.to(device)
 
-    def predict_sample(self, sample: Iterable[np.ndarray], **kwargs) -> list[PlayersKeypoints]:
+    def predict_sample(self, frames: Iterable[np.ndarray], **kwargs) -> list[FramePoses]:
         """
-        Prediction over a sample of frames
+        Predicts player poses (keypoints) for a batch of video frames.
+        Each frame result contains zero or more player poses.
         """
 
-        h_frame, w_frame = sample[0].shape[:2]
-        ratio_x = w_frame / self.train_image_size
-        ratio_y = h_frame / self.train_image_size
+        frame_height, frame_width = frames[0].shape[:2]
+        ratio_x = frame_width / self.train_image_size
+        ratio_y = frame_height / self.train_image_size
 
-        sample = [
-            self.processor(frame)
-            for frame in sample
-        ]
-        
-        results = self.model.predict(
-            sample,
+        preprocessed_frames = []
+        for frame in frames:
+            preprocessed_frame = self.processor(frame)
+            preprocessed_frames.append(preprocessed_frame)
+
+        model_outputs = self.model.predict(
+            preprocessed_frames,
             conf=self.CONF,
             iou=self.IOU,
             imgsz=self.train_image_size,
             device=self.DEVICE,
-            classes=[0],
+            classes=[0],  # assuming class 0 is "player"
         )
 
-        predictions = []
-        for result in results:
+        all_frames_poses = []
 
-            players_keypoints = []
+        for frame_output in model_outputs:
 
-            players_keypoints_detection = result.keypoints.xy.squeeze(0)
-            if len(players_keypoints_detection) == 2:
-                players_keypoints_detection = players_keypoints_detection.unsqueeze(0)
+            players_in_frame = []
 
-            for player_keypoints_detection in players_keypoints_detection:
-                player_keypoints_list = []
-                for i in range(len(player_keypoints_detection)):
-                    keypoint = player_keypoints_detection[i]
-                    player_keypoint = PlayerKeypoint(
-                        id=i,
-                        name=PlayerKeypoints.KEYPOINTS_NAMES[i],
+            # # shape: (num_players, num_joints, 2)
+            # player_poses_xy = frame_output.keypoints.xy.squeeze(0)
+            #
+            # # Fix bad squeeze: if only 1 player detected
+            # if len(player_poses_xy) == 2:
+            #     player_poses_xy = player_poses_xy.unsqueeze(0)
+
+            player_poses_xy = frame_output.keypoints.xy
+            for player_pose_xy in player_poses_xy:
+
+                player_joints = []
+                for joint_id in range(len(player_pose_xy)):
+                    joint_xy = player_pose_xy[joint_id]
+                    joint = BodyJoint(
+                        id=joint_id,
+                        name=PlayerPose.KEYPOINTS_NAMES[joint_id],
                         xy=(
-                            keypoint[0].item() * ratio_x,
-                            keypoint[1].item() * ratio_y,
+                            joint_xy[0].item() * ratio_x,
+                            joint_xy[1].item() * ratio_y,
                         )
                     )
-                    player_keypoints_list.append(player_keypoint)
+                    player_joints.append(joint)
 
-                player_keypoints = PlayerKeypoints(
-                    player_keypoints=player_keypoints_list
+                player_pose = PlayerPose(
+                    body_joints=player_joints
                 )
 
-                players_keypoints.append(player_keypoints)
+                players_in_frame.append(player_pose)
 
-            predictions.append(PlayersKeypoints(players_keypoints))
-        
-        return predictions
-    
+            frame_poses = FramePoses(players_in_frame)
+            all_frames_poses.append(frame_poses)
+
+        return all_frames_poses
+
     def predict_frames(self, frame_generator: Iterable[np.ndarray], **kwargs):
         raise NoPredictFrames()
 
