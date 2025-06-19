@@ -19,5 +19,6 @@ models/
 /venv/
 /model_weights/
 /data
+/cache
 
 **/*Zone.Identifier

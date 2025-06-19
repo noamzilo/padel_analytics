@@ -294,29 +294,32 @@ class PlayerKeypointsTracker(Tracker):
         predictions = []
         for result in results:
 
-            players_keypoints = [] 
+            players_keypoints = []
 
             players_keypoints_detection = result.keypoints.xy.squeeze(0)
             if len(players_keypoints_detection) == 2:
                 players_keypoints_detection = players_keypoints_detection.unsqueeze(0)
 
             for player_keypoints_detection in players_keypoints_detection:
-                player_keypoints = PlayerKeypoints(
-                    player_keypoints=[
-                        PlayerKeypoint(
-                            id=i,
-                            name=PlayerKeypoints.KEYPOINTS_NAMES[i],
-                            xy=(
-                                keypoint[0].item() * ratio_x,
-                                keypoint[1].item() * ratio_y,
-                            )
+                player_keypoints_list = []
+                for i in range(len(player_keypoints_detection)):
+                    keypoint = player_keypoints_detection[i]
+                    player_keypoint = PlayerKeypoint(
+                        id=i,
+                        name=PlayerKeypoints.KEYPOINTS_NAMES[i],
+                        xy=(
+                            keypoint[0].item() * ratio_x,
+                            keypoint[1].item() * ratio_y,
                         )
-                        for i, keypoint in enumerate(player_keypoints_detection)
-                    ]
+                    )
+                    player_keypoints_list.append(player_keypoint)
+
+                player_keypoints = PlayerKeypoints(
+                    player_keypoints=player_keypoints_list
                 )
 
                 players_keypoints.append(player_keypoints)
-            
+
             predictions.append(PlayersKeypoints(players_keypoints))
         
         return predictions

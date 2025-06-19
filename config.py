@@ -2,10 +2,12 @@
 import os
 
 # Input video path
-# INPUT_VIDEO_PATH = "./examples/videos/rally.mp4"
 INPUT_VIDEO_DIR = "/mnt/c/data/plai/rallies/CVSPORTS_Padel/rallies"
 INPUT_VIDEO_NAME = "20231015_AMSTERDAM_04.mp4"
 INPUT_VIDEO_PATH = os.path.join(INPUT_VIDEO_DIR, INPUT_VIDEO_NAME)
+
+INPUT_VIDEO_NAME = "example.mp4"
+INPUT_VIDEO_PATH = "./examples/videos/rally.mp4"
 
 # Inference video path
 OUTPUT_VIDEO_PATH = f"results_{INPUT_VIDEO_NAME}.mp4"
